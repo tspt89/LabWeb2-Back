@@ -47,7 +47,8 @@ router.post('/login/', (req,res) =>{
                 res.statusCode = 401;
                 res.json({Satus: 'Login incorrect, try again'});
             } else {
-                res.json({Status: 'Employeed LoggedIn', idInserted: rows.insertId});
+                console.log(rows[0].nombre);
+                res.json({Status: 'Employeed LoggedIn', id: rows[0].id,name: rows[0].nombre,dept: rows[0].tipo_user});
             }
             
         } else {
@@ -59,7 +60,6 @@ router.post('/login/', (req,res) =>{
 })
 
 router.post('/adddocument/', (req,res) =>{
-    //INSERT INTO usuario VALUES (NULL, _name, extension, fecha, periodo, estado, isActive, usuario emisor);
     console.log(req.body);
     const query = 'INSERT INTO documentos VALUES (NULL, ?, ?, ?, ?, ?, ?, ?);';
     const {name, ext, fecha, periodo, estado, isActive, usuario_fk} = req.body;
@@ -76,10 +76,10 @@ router.post('/adddocument/', (req,res) =>{
 
 })
 
-router.get('/getdocs/', (req,res) => {
+router.get('/getdocsadmin/', (req,res) => {
     console.log(req.body);
     
-    mysqlConnection.query('SELECT * FROM documentos',(err,rows,fields) => {
+    mysqlConnection.query('SELECT * FROM documentos WHERE isActive = true;',(err,rows,fields) => {
         if(!err){
             res.json(rows);
         } else {
@@ -127,8 +127,7 @@ router.post('/deletedoc/', (req,res) =>{
 router.get('/getdocsbyuser/', (req,res) => {
     console.log(req.body);
     
-    console.log(req.body);
-    const query = 'SELECT * FROM documentos WHERE id_documentos = ? and isActive = true;';
+    const query = 'SELECT * FROM documentos WHERE and isActive = true AND usuario_emisor = ?;';
     const {id} = req.body;
     mysqlConnection.query(query, [id], (err,rows,fields) => {
         if(!err){
@@ -142,6 +141,42 @@ router.get('/getdocsbyuser/', (req,res) => {
     })
 })
 
+router.post('/addnotif/', (req,res) => {
+    console.log(req.body);
+    
+    console.log(req.body);
+    //INSERT INTO `actividadweb2`.`notificaciones` (`notificacion`, `tipo_usuario`, `usuario_emisor`) VALUES ('Notificación 1', '101', '2');
+    const query = 'INSERT INTO notificaciones VALUES (NULL,?,?,?)';
+    const {notificacion,tipo_usuario, usuario_emisor} = req.body;
+    mysqlConnection.query(query, [notificacion,tipo_usuario,usuario_emisor], (err,rows,fields) => {
+        if(!err){
+            console.log(rows)
+            res.json(rows);
+        } else {
+            console.log(err);
+            res.statusCode = 400;
+            res.json({response: 'Query incorrect'});
+        }
+    })
+})
 
+router.get('/getnotif/', (req,res) => {
+    console.log(req.body);
+    
+    console.log(req.body);
+    //INSERT INTO `actividadweb2`.`notificaciones` (`notificacion`, `tipo_usuario`, `usuario_emisor`) VALUES ('Notificación 1', '101', '2');
+    const query = 'SELECT * FROM notificaciones';
+    
+    mysqlConnection.query(query, (err,rows,fields) => {
+        if(!err){
+            console.log(rows)
+            res.json(rows);
+        } else {
+            console.log(err);
+            res.statusCode = 400;
+            res.json({response: 'Query incorrect'});
+        }
+    })
+})
 
 module.exports = router;
