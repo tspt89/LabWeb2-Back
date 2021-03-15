@@ -7,18 +7,6 @@ const mysqlConnection = require('../database');
 const app = express();
 
 
-router.get('/', (req,res) => {
-    console.log(req.body);
-    
-    mysqlConnection.query('SELECT * FROM employees',(err,rows,fields) => {
-        if(!err){
-            res.json(rows);
-        } else {
-            console.log(err);
-        }
-    })
-})
-
 router.post('/addusuario/', (req,res) =>{
     //INSERT INTO usuario VALUES (NULL, _name, _correo, _passwd, _rfc, _domicilio, _dept, _tel, _isActive, _userType);
     console.log(req.body);
@@ -38,7 +26,7 @@ router.post('/addusuario/', (req,res) =>{
 router.post('/login/', (req,res) =>{
     //INSERT INTO usuario VALUES (NULL, _name, _correo, _passwd, _rfc, _domicilio, _dept, _tel, _isActive, _userType);
     console.log(req.body);
-    const query = 'SELECT * FROM usuario WHERE correo = ? AND password = ? AND isActive = 1 LIMIT 1';
+    const query = 'SELECT * FROM usuario WHERE correo = ? AND password = ?';
     const {email, passwd} = req.body;
     mysqlConnection.query(query, [email, passwd], (err,rows,fields) => {
         if(!err){
@@ -61,9 +49,10 @@ router.post('/login/', (req,res) =>{
 
 router.post('/adddocument/', (req,res) =>{
     console.log(req.body);
-    const query = 'INSERT INTO documentos VALUES (NULL, ?, ?, ?, ?, ?, ?, ?);';
-    const {name, ext, fecha, periodo, estado, isActive, usuario_fk} = req.body;
-    mysqlConnection.query(query, [name, ext, fecha, periodo, estado, isActive, usuario_fk], (err,rows,fields) => {
+    //INSERT INTO `actividadweb2`.`documentos` (`nombre_doc`, `ext_archivo`, `fecha_carga`, `periodo_info`, `estado`, `isActive`, `usuario_emisor`, `dept`) VALUES ('asdasd', 'sds', '2021-03-08', '2021-03-08', '0', '1', '1', '100');
+    const query = 'INSERT INTO documentos VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?);';
+    const {name, ext, fecha, periodo, estado, isActive, usuario_fk,dept} = req.body;
+    mysqlConnection.query(query, [name, ext, fecha, periodo, estado, isActive, usuario_fk,dept], (err,rows,fields) => {
         if(!err){
             console.log(rows)
             res.json({Status: 'Document Saved', idInserted: rows.insertId});
@@ -124,12 +113,12 @@ router.post('/deletedoc/', (req,res) =>{
 
 })
 
-router.get('/getdocsbyuser/', (req,res) => {
+router.post('/getdocsbyuser/', (req,res) => {
     console.log(req.body);
     
-    const query = 'SELECT * FROM documentos WHERE and isActive = true AND usuario_emisor = ?;';
-    const {id} = req.body;
-    mysqlConnection.query(query, [id], (err,rows,fields) => {
+    const query = 'SELECT * FROM documentos WHERE isActive = true AND usuario_emisor = ?;';
+    const {id, dept} = req.body;
+    mysqlConnection.query(query, [id,dept], (err,rows,fields) => {
         if(!err){
             console.log(rows)
             res.json(rows);
@@ -168,6 +157,78 @@ router.get('/getnotif/', (req,res) => {
     const query = 'SELECT * FROM notificaciones';
     
     mysqlConnection.query(query, (err,rows,fields) => {
+        if(!err){
+            console.log(rows)
+            res.json(rows);
+        } else {
+            console.log(err);
+            res.statusCode = 400;
+            res.json({response: 'Query incorrect'});
+        }
+    })
+})
+
+//Get nominas
+router.post('/getnomina/', (req,res) => {
+    console.log(req.body);
+    
+    const query = 'SELECT * FROM documentos WHERE isActive = true AND usuario_emisor = ? AND dept = 000;';
+    const {id} = req.body;
+    mysqlConnection.query(query, [id], (err,rows,fields) => {
+        if(!err){
+            console.log(rows)
+            res.json(rows);
+        } else {
+            console.log(err);
+            res.statusCode = 400;
+            res.json({response: 'Query incorrect'});
+        }
+    })
+})
+
+//Get contabilidad por usuario
+router.post('/getcontabilidad/', (req,res) => {
+    console.log(req.body);
+    
+    const query = 'SELECT * FROM documentos WHERE isActive = true AND usuario_emisor = ? AND dept = 001;';
+    const {id, dept} = req.body;
+    mysqlConnection.query(query, [id,dept], (err,rows,fields) => {
+        if(!err){
+            console.log(rows)
+            res.json(rows);
+        } else {
+            console.log(err);
+            res.statusCode = 400;
+            res.json({response: 'Query incorrect'});
+        }
+    })
+})
+
+//Get RH por usuario
+router.post('/getrh/', (req,res) => {
+    console.log(req.body);
+    
+    const query = 'SELECT * FROM documentos WHERE isActive = true AND usuario_emisor = ? AND dept = 010;';
+    const {id, dept} = req.body;
+    mysqlConnection.query(query, [id,dept], (err,rows,fields) => {
+        if(!err){
+            console.log(rows)
+            res.json(rows);
+        } else {
+            console.log(err);
+            res.statusCode = 400;
+            res.json({response: 'Query incorrect'});
+        }
+    })
+})
+
+//Get documentacion por usuario
+router.post('/getdoc/', (req,res) => {
+    console.log(req.body);
+    
+    const query = 'SELECT * FROM documentos WHERE isActive = true AND usuario_emisor = ? AND dept = 100;';
+    const {id} = req.body;
+    mysqlConnection.query(query, [id], (err,rows,fields) => {
         if(!err){
             console.log(rows)
             res.json(rows);
