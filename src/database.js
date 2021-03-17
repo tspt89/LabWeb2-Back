@@ -4,8 +4,9 @@ const mysqlConnection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'password',
-    database: 'actividadWeb2'
-})
+    database: 'actividadWeb2',
+    multipleStatements: true
+});
 
 mysqlConnection.connect( function(err ){
     if(err){
